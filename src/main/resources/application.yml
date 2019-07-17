@@ -1,0 +1,38 @@
+spring:
+  resources:
+    static-locations: classpath:/templates/,classpath:/static/,classpath:/public/
+  datasource:
+    master:
+      driver-class-name: com.mysql.cj.jdbc.Driver
+      jdbc-url: jdbc:mysql://192.168.127.132:3309/tt?useUnicode=true&&useSSL=false&characterEncoding=UTF-8&connectTimeout=300000&socketTimeout=300000&serverTimezone=GMT%2B8
+      username: root
+      password: root
+    slave01:
+      driver-class-name: com.mysql.cj.jdbc.Driver
+      jdbc-url: jdbc:mysql://192.168.127.132:3307/tt?useUnicode=true&&useSSL=false&characterEncoding=UTF-8&connectTimeout=300000&socketTimeout=300000&serverTimezone=GMT%2B8
+      username: root #只读
+      password: root
+    slave02:
+      driver-class-name: com.mysql.cj.jdbc.Driver
+      jdbc-url: jdbc:mysql://192.168.127.132:3308/tt?useUnicode=true&&useSSL=false&characterEncoding=UTF-8&connectTimeout=300000&socketTimeout=300000&serverTimezone=GMT%2B8
+      username: root #只读
+      password: root
+#      配置 elasticsearch 节点
+  data:
+    elasticsearch:
+      cluster-name: my-application
+      cluster-nodes: 192.168.127.132:9300
+#     配置 elasticsearch 健康检查的uri 默认 是localhost：9200
+  elasticsearch:
+    rest:
+      uris: ["192.168.127.132:9200"]
+server:
+  port: 8888
+  servlet:
+    context-path: /
+#mybatis:
+##  mapper-locations: classpath*:com/hjx/springbootmybatis/mapper/**
+#  type-aliases-package: com.hjx.springbootmybatis.entity
+logging:
+  level:
+    com.hjx.springbootmybatis: debug
