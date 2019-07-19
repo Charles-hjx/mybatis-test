@@ -2,6 +2,9 @@ package com.hjx.springbootmybatis;
 
 import com.hjx.springbootmybatis.entity.Item;
 import com.hjx.springbootmybatis.es.repository.ItemRepository;
+import org.apache.hadoop.conf.Configuration;
+import org.apache.hadoop.fs.FileSystem;
+import org.apache.hadoop.fs.Path;
 import org.elasticsearch.index.query.QueryBuilders;
 import org.elasticsearch.search.aggregations.AggregationBuilders;
 import org.elasticsearch.search.aggregations.bucket.terms.StringTerms;
@@ -22,6 +25,7 @@ import org.springframework.data.elasticsearch.core.query.NativeSearchQueryBuilde
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.web.bind.annotation.GetMapping;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -227,6 +231,26 @@ public class SpringbootMybatisApplicationTests {
             System.out.println("平均售价：" + avg.getValue());
         }
 
+    }
+
+    @Test
+    public void testCommon(){
+        System.out.println(Math.round(2.4));
+    }
+
+    @Test
+    public void testHadoop() throws IOException {
+        System.setProperty("HADOOP_USER_NAME","hjx");
+        Configuration configuration = new Configuration();
+        configuration.set("fs.defaultFS","hdfs://ubuntu01:9000");
+        FileSystem fileSystem = FileSystem.get(configuration);
+
+        // 2 把本地文件上传到文件系统中
+        fileSystem.copyFromLocalFile(new Path("f:/hello.txt"), new Path("/hello1.copy.txt"));
+
+        // 3 关闭资源
+        fileSystem.close();
+        System.out.println("over");
     }
 
 }

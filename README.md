@@ -19,4 +19,21 @@ learning mybatis source code
 
 ## spring data elasticsearch
 
+##   配置 elasticsearch 节点 
+## 即可使用 es默认会去健康检查，ip 默认是 本地。所以会报错
+  data:
+    elasticsearch:
+      cluster-name: my-application
+      cluster-nodes: 192.168.127.132:9300
+##     配置 elasticsearch 健康检查的uri 默认 是localhost：9200
+  elasticsearch:
+    rest:
+      uris: ["192.168.127.132:9200"]
 
+
+
+##hadoop：主要是 pom文件的 配置 and 默认访问用户的 设置
+        1.具体查看 pox.xml
+        2.默认访问用户 可以通过 idea 设置 系统环境变量，否则会是本地主机名
+        
+        
