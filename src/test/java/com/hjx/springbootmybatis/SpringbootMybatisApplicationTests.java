@@ -3,8 +3,7 @@ package com.hjx.springbootmybatis;
 import com.hjx.springbootmybatis.entity.Item;
 import com.hjx.springbootmybatis.es.repository.ItemRepository;
 import org.apache.hadoop.conf.Configuration;
-import org.apache.hadoop.fs.FileSystem;
-import org.apache.hadoop.fs.Path;
+import org.apache.hadoop.fs.*;
 import org.elasticsearch.index.query.QueryBuilders;
 import org.elasticsearch.search.aggregations.AggregationBuilders;
 import org.elasticsearch.search.aggregations.bucket.terms.StringTerms;
@@ -22,10 +21,14 @@ import org.springframework.data.elasticsearch.core.ElasticsearchTemplate;
 import org.springframework.data.elasticsearch.core.aggregation.AggregatedPage;
 import org.springframework.data.elasticsearch.core.query.FetchSourceFilter;
 import org.springframework.data.elasticsearch.core.query.NativeSearchQueryBuilder;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.web.bind.annotation.GetMapping;
 
 import java.io.IOException;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.sql.SQLOutput;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -238,9 +241,11 @@ public class SpringbootMybatisApplicationTests {
         System.out.println(Math.round(2.4));
     }
 
+    //测试文件的上传
     @Test
     public void testHadoop() throws IOException {
-        System.setProperty("HADOOP_USER_NAME","hjx");
+        //zhelde的设置没起到作用 靠的是 系统环境变量的设置
+//        System.setProperty("HADOOP_USER_NAME","hjx");
         Configuration configuration = new Configuration();
         configuration.set("fs.defaultFS","hdfs://ubuntu01:9000");
         FileSystem fileSystem = FileSystem.get(configuration);
@@ -252,5 +257,65 @@ public class SpringbootMybatisApplicationTests {
         fileSystem.close();
         System.out.println("over");
     }
+
+    //测试 // 参数优先级： 1、客户端代码中设置的值  2、classpath下的用户自定义配置文件 3、然后是服务器的默认配置
+    @Test
+    public void testHadoopGet() throws IOException {
+        // new Configuration();的时候，它就会去加载jar包中的hdfs-default.xml
+        // 然后再加载classpath下的hdfs-site.xml
+        Configuration configuration = new Configuration();
+//        configuration.set("fs.defaultFS","hdfs://ubuntu01:9000");
+        //设置副本数
+        configuration.set("dfs.replication",",");
+        FileSystem fileSystem = FileSystem.get(configuration);
+
+        System.out.println(fileSystem.toString());
+    }
+
+    //文件上传
+    @Test
+    public void testUploadFile() throws URISyntaxException, IOException, InterruptedException {
+
+        Configuration configuration = new Configuration();
+        String srcUrl = "f:/question.txt";
+        String dstUrl = "hdfs://ubuntu01:9000/user/hjx/que.txt";
+        //这里对用户的设置 在服务器中 起作用的 但“hjx” 会被拒绝 “root”则不会
+        FileSystem fileSystem = FileSystem.get(new URI("hdfs://ubuntu01:9000"), configuration, "hjx");
+        fileSystem.copyFromLocalFile(new Path(srcUrl),new Path(dstUrl));
+
+        fileSystem.close();
+    }
+
+
+    //获取 block 块位置
+
+    @Test
+    public void testGetBlockLocation() throws IOException, URISyntaxException, InterruptedException {
+        Configuration configuration = new Configuration();
+        //获取文件系统
+        FileSystem fs = FileSystem.get(new URI("hdfs:/ubuntu01:9000"),configuration,"hjx");
+
+        RemoteIterator<LocatedFileStatus> listFiles = fs.listFiles(new Path("/"), true);
+        while (listFiles.hasNext()){
+            LocatedFileStatus fileStatus = listFiles.next();
+            System.out.println(fileStatus.getPath().getName());
+            System.out.println(fileStatus.getBlockSize());
+            System.out.println(fileStatus.getPermission());
+            System.out.println(fileStatus.getLen());
+            BlockLocation[] blockLocations = fileStatus.getBlockLocations();
+            for (int i = 0; i < blockLocations.length; i++) {
+                BlockLocation blockLocation = blockLocations[i];
+                String[] hosts = blockLocation.getHosts();
+                for (int j = 0; j < hosts.length; j++) {
+                    String host = hosts[j];
+                    System.out.println("block location:====>>>:"+host);
+                }
+
+                System.out.println("======================");
+            }
+        }
+    }
+
+
 
 }

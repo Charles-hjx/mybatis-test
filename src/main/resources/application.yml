@@ -1,4 +1,10 @@
 spring:
+  rabbitmq:
+    host: 192.168.127.132
+    port: 5672
+    username: hjx
+    password: 123456
+    publisher-confirms: true
   resources:
     static-locations: classpath:/templates/,classpath:/static/,classpath:/public/
   datasource:
