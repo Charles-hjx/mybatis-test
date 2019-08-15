@@ -36,8 +36,10 @@ public class MyBatisConfig {
     public SqlSessionFactory sqlSessionFactory() throws Exception {
         SqlSessionFactoryBean sqlSessionFactoryBean = new SqlSessionFactoryBean();
         sqlSessionFactoryBean.setDataSource(myRoutingDataSource);
-        sqlSessionFactoryBean.setMapperLocations(new PathMatchingResourcePatternResolver().getResources("classpath*:com/hjx/springbootmybatis/mapper/**"));
+        sqlSessionFactoryBean.setMapperLocations(new PathMatchingResourcePatternResolver()
+                .getResources("classpath*:com/hjx/springbootmybatis/mapper/**"));
         sqlSessionFactoryBean.setTypeAliasesPackage("com.hjx.springbootmybatis.entity");
+
         return sqlSessionFactoryBean.getObject();
     }
 
